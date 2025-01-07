@@ -1,0 +1,10 @@
+{
+    "applicant_name": "John Doe",
+    "email": "doe@test.com(opens in a new tab)",
+    "phone": "1234567890",
+    "pets": [
+        {"species": "Cat","id": "2","name": "Mittens","date_entered": "2024-06-20","image": "pet2.jpeg","age": "3"},
+        {"species": "Dog","id": "3","name": "Rex","date_entered": "2024-07-05","image": "pet6.jpeg","age": "1"}
+    ],
+    "submitted_at": "2024-09-04T13:41:33.688Z"
+}

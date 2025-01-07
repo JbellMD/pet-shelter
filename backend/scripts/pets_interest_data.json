@@ -1,0 +1,23 @@
+[
+    {
+        "id": "1",
+        "pet_id": "1",
+        "adoption_requests": "5"
+    },
+    {
+        "id": "2",
+        "pet_id": "2",
+        "adoption_requests": "4"
+    },
+    {
+        "id": "3",
+        "pet_id": "3",
+        "adoption_requests": "0"
+    },
+    {
+        "id": "4",
+        "pet_id": "4",
+        "adoption_requests": "10"
+    }
+
+]
