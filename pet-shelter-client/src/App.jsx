@@ -132,8 +132,29 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        <AppBar position="sticky" color="default">
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          minHeight: '100vh',
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: 'url("/pets.png")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            opacity: 0.15,
+            zIndex: -1
+          }
+        }}
+      >
+        <AppBar position="sticky" color="default" sx={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(8px)' }}>
           <Container maxWidth="lg">
             <Toolbar sx={{ justifyContent: 'space-between', padding: '1rem 0' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -266,6 +287,8 @@ function App() {
           sx={{ 
             flex: 1,
             py: 8,
+            position: 'relative',
+            zIndex: 1
           }}
         >
           <motion.div
@@ -363,9 +386,12 @@ function App() {
             py: 3,
             px: 2,
             mt: 'auto',
-            backgroundColor: 'background.paper',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
             borderTop: '1px solid',
             borderColor: 'divider',
+            backdropFilter: 'blur(8px)',
+            position: 'relative',
+            zIndex: 1
           }}
         >
           <Container maxWidth="lg">
