@@ -1,8 +1,25 @@
-import { useEffect, useState } from "react";
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-import "./styles.css";
-import {Routes, Route, Link} from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  Button, 
+  Container, 
+  Box,
+  IconButton,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  useTheme,
+  useMediaQuery
+} from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles';
+import { motion } from 'framer-motion';
+import MenuIcon from '@mui/icons-material/Menu';
+import PetsIcon from '@mui/icons-material/Pets';
+import { theme } from './theme';
+import { Routes, Route, Link } from "react-router-dom";
 import Header from "./components/Header";
 import Home from "./components/Home";
 import AboutUs from "./components/AboutUs";
@@ -13,7 +30,6 @@ import Applications from "./components/Applications";
 import ApplicationDetail from "./components/ApplicationDetail";
 import axios from "axios"
 
- 
 // Import the .env variables containing Cognito configuration information
 const COGNITO_AUTH_URL = import.meta.env.VITE_COGNITO_AUTH_URL;
 const CLIENT_ID = import.meta.env.VITE_CLIENT_ID; 
@@ -29,6 +45,20 @@ function App() {
   
   const [isUserSignedIn, setIsUserSignedIn] = useState(false);
   const [error, setError] = useState("")
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const navItems = [
+    { title: 'Home', path: '/' },
+    { title: 'About Us', path: '/about' },
+    { title: 'Pets', path: '/pets' },
+    { title: 'Adopt', path: '/adopt' },
+  ];
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
   // console.log(localStorage.getItem("accessToken"));
   if (
@@ -61,7 +91,7 @@ function App() {
       setIsUserSignedIn(false);
     }
   }, []);
-  
+
   const handleSignOut = () => {
     // Clear the ID token from localStorage
     localStorage.removeItem("accessToken");
@@ -74,7 +104,7 @@ function App() {
       window.location.href = `${COGNITO_AUTH_URL}/logout?client_id=${CLIENT_ID}&response_type=token&scope=email+openid&logout_uri=${REDIRECT_URI}&redirect_uri=${REDIRECT_URI}`;     
     }, 1000);
   };
-  
+
   const handleGenerateReport = () =>{
     axios.post(`${API_GATEWAY_BASE_URL}/create-report`, {"msg": "Requesting report"})
       .then((res)=>{
@@ -88,10 +118,7 @@ function App() {
         setError(`Error generating report: ${err}`)
       })
   }
-    
-    
-  // END COGNITO CODE //
-  
+
   useEffect(()=>{
     // get pets from api
     axios.get(`${API_GATEWAY_BASE_URL}/pets`)
@@ -102,69 +129,225 @@ function App() {
       .catch(err => console.log(err))
   },[])
   const [pets, setPets] = useState([]);
+
   return (
-    <div className="App">
-      <Header isUserSignedIn={isUserSignedIn}/>
-      {/* at the route /, the home compnent renders */}
-      <main>
-        <div>
-          {isUserSignedIn ? (
-            // Render content for signed-in users
-            <div>
-              <div>Signed in as employee</div>
-              <button
-                onClick={handleSignOut}
-                style={{
-                  color: "white",
-                  backgroundColor: "red",
-                  padding: "8px 16px",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  margin: "10px"
-                }}
-              >
-                Sign Out
-              </button> 
-              <br></br>
-              <button
-                onClick={handleGenerateReport}
-                id="report_btn"
-                style={{
-                  color: "white",
-                  backgroundColor: "green",
-                  padding: "8px 16px",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  margin: "10px"
-                }}
-              >
-                Generate Report
-              </button> 
-            </div>
-          ) : (
-            // Render content for signed-out users
-            <div>
-              <a href={`${COGNITO_AUTH_URL}/login?client_id=${CLIENT_ID}&response_type=token&scope=email+openid&redirect_uri=${REDIRECT_URI}`}>
-                <button
-                  style={{
-                    color: "white",
-                    backgroundColor: "blue",
-                    padding: "8px 16px",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    margin: "10px"
+    <ThemeProvider theme={theme}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <AppBar position="sticky" color="default">
+          <Container maxWidth="lg">
+            <Toolbar sx={{ justifyContent: 'space-between', padding: '1rem 0' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <motion.div
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <PetsIcon sx={{ color: 'primary.main', fontSize: '2rem' }} />
+                </motion.div>
+                <Typography
+                  variant="h6"
+                  component="div"
+                  sx={{ 
+                    fontWeight: 700,
+                    background: 'linear-gradient(45deg, #3B82F6 30%, #10B981 90%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent'
                   }}
                 >
-                Employee Sign In
-              </button> 
-              </a>               
-            </div>
-          )}
-        </div>
-        <p style={{color: 'red'}}>{error}</p>
+                  AnyCompany Pet Shelter
+                </Typography>
+              </Box>
+
+              {isMobile ? (
+                <IconButton
+                  color="primary"
+                  aria-label="open drawer"
+                  edge="start"
+                  onClick={handleDrawerToggle}
+                >
+                  <MenuIcon />
+                </IconButton>
+              ) : (
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  {navItems.map((item) => (
+                    <Button
+                      key={item.title}
+                      color="primary"
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: 'primary.light',
+                          color: 'white',
+                        },
+                      }}
+                    >
+                      <Link to={item.path} style={{textDecoration: 'none', color: 'inherit'}}>{item.title}</Link>
+                    </Button>
+                  ))}
+                  {isUserSignedIn ? (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      sx={{
+                        ml: 2,
+                        '&:hover': {
+                          transform: 'translateY(-2px)',
+                          boxShadow: 4,
+                        },
+                      }}
+                      onClick={handleSignOut}
+                    >
+                      Sign Out
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      sx={{
+                        ml: 2,
+                        '&:hover': {
+                          transform: 'translateY(-2px)',
+                          boxShadow: 4,
+                        },
+                      }}
+                    >
+                      <a href={`${COGNITO_AUTH_URL}/login?client_id=${CLIENT_ID}&response_type=token&scope=email+openid&redirect_uri=${REDIRECT_URI}`} style={{textDecoration: 'none', color: 'white'}}>Employee Sign In</a>
+                    </Button>
+                  )}
+                </Box>
+              )}
+            </Toolbar>
+          </Container>
+        </AppBar>
+
+        <Drawer
+          variant="temporary"
+          anchor="right"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true,
+          }}
+        >
+          <Box sx={{ width: 250, pt: 2 }}>
+            <List>
+              {navItems.map((item) => (
+                <ListItem button key={item.title}>
+                  <Link to={item.path} style={{textDecoration: 'none', color: 'inherit'}}><ListItemText primary={item.title} /></Link>
+                </ListItem>
+              ))}
+              {isUserSignedIn ? (
+                <ListItem>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSignOut}
+                  >
+                    Sign Out
+                  </Button>
+                </ListItem>
+              ) : (
+                <ListItem>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                  >
+                    <a href={`${COGNITO_AUTH_URL}/login?client_id=${CLIENT_ID}&response_type=token&scope=email+openid&redirect_uri=${REDIRECT_URI}`} style={{textDecoration: 'none', color: 'white'}}>Employee Sign In</a>
+                  </Button>
+                </ListItem>
+              )}
+            </List>
+          </Box>
+        </Drawer>
+
+        <Container 
+          component="main" 
+          maxWidth="lg" 
+          sx={{ 
+            flex: 1,
+            py: 8,
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Typography
+              variant="h1"
+              component="h1"
+              align="center"
+              gutterBottom
+              sx={{
+                fontSize: { xs: '2rem', md: '3rem' },
+                mb: 4,
+                background: 'linear-gradient(45deg, #3B82F6 30%, #10B981 90%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}
+            >
+              Welcome to our Pet Shelter
+            </Typography>
+
+            <Typography
+              variant="h5"
+              component="p"
+              align="center"
+              color="text.secondary"
+              sx={{
+                maxWidth: '800px',
+                mx: 'auto',
+                mb: 6,
+                lineHeight: 1.8
+              }}
+            >
+              Welcome to AnyCompany Pet Shelter, where we care for and find loving homes for stray and abandoned pets. 
+              Our shelter provides a safe haven for dogs and cats while we work tirelessly to match them with their forever families.
+              We believe every pet deserves a second chance at happiness and are committed to ensuring they receive the best care and love.
+            </Typography>
+
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 2,
+                justifyContent: 'center',
+                flexWrap: 'wrap'
+              }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                sx={{
+                  px: 4,
+                  py: 1.5,
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: 4,
+                  },
+                }}
+              >
+                <Link to="/pets" style={{textDecoration: 'none', color: 'white'}}>View Available Pets</Link>
+              </Button>
+              <Button
+                variant="outlined"
+                color="primary"
+                size="large"
+                sx={{
+                  px: 4,
+                  py: 1.5,
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: 2,
+                  },
+                }}
+              >
+                Learn More
+              </Button>
+            </Box>
+          </motion.div>
+        </Container>
+
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutUs />} />
@@ -173,9 +356,32 @@ function App() {
           <Route path="/applications" element={<Applications />} />
           <Route path="/applications/:id" element={<ApplicationDetail/>}/>
         </Routes>
-      </main>
-      <Footer/>
-    </div>
+
+        <Box
+          component="footer"
+          sx={{
+            py: 3,
+            px: 2,
+            mt: 'auto',
+            backgroundColor: 'background.paper',
+            borderTop: '1px solid',
+            borderColor: 'divider',
+          }}
+        >
+          <Container maxWidth="lg">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              align="center"
+            >
+              {'Copyright '}
+              {new Date().getFullYear()}
+              {' AnyCompany Pet Shelter. All rights reserved.'}
+            </Typography>
+          </Container>
+        </Box>
+      </Box>
+    </ThemeProvider>
   );
 }
 
